@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { gql } from "@apollo/client";
 import { useMutation, useApolloClient } from "@apollo/client";
-import { getErrorMessage } from "../lib/form";
 
 import { useForm } from "react-hook-form";
 import {
@@ -45,6 +44,7 @@ function SignIn() {
       }
     },
   });
+
   const router = useRouter();
   const {
     handleSubmit,

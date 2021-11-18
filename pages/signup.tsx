@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { NextPage } from "next";
 import { gql, useMutation } from "@apollo/client";
-import { getErrorMessage } from "../lib/form";
+
 import { useForm } from "react-hook-form";
 import {
   Flex,
