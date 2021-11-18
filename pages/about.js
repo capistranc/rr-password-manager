@@ -1,13 +1,13 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function About() {
   return (
     <div>
-      Welcome to the about page. Go to the{' '}
+      Welcome to the about page. Go to the{" "}
       <Link href="/">
         <a>Home</a>
-      </Link>{' '}
+      </Link>{" "}
       page.
     </div>
-  )
+  );
 }

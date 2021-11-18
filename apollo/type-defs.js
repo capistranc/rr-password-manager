@@ -1,10 +1,36 @@
-import { gql } from '@apollo/client'
+import { gql } from "@apollo/client";
 
 export const typeDefs = gql`
   type User {
-    id: ID!
+    userId: ID!
     email: String!
     createdAt: Int!
+    iv: String!
+  }
+
+  type Account {
+    accountId: ID!
+    url: String!
+    username: String!
+    hash: String!
+  }
+
+  input NewAccountInput {
+    userId: ID!
+    url: String!
+    username: String!
+    password: String!
+  }
+
+  input UpdateAccountInput {
+    accountId: ID!
+    url: String!
+    username: String!
+    password: String!
+  }
+
+  input DeleteAccountInput {
+    accountId: ID!
   }
 
   input SignUpInput {
@@ -25,15 +51,23 @@ export const typeDefs = gql`
     user: User!
   }
 
+  type NewAccountPayload {
+    accountId: String!
+  }
+
   type Query {
-    user(id: ID!): User!
+    user(userId: ID!): User!
     users: [User]!
     viewer: User
+    accounts(userId: ID!): [Account]!
   }
 
   type Mutation {
     signUp(input: SignUpInput!): SignUpPayload!
     signIn(input: SignInInput!): SignInPayload!
+    addAccount(input: NewAccountInput!): NewAccountPayload!
+    updateAccount(input: UpdateAccountInput!): Boolean!
+    deleteAccount(input: DeleteAccountInput!): Boolean!
     signOut: Boolean!
   }
-`
+`;
