@@ -96,7 +96,7 @@ const Index = ({ accounts }) => {
 export async function getServerSideProps(context: NextPageContext) {
   const session = await getLoginSession(context.req as NextApiRequest);
 
-  if (!session) return;
+  if (!session) return { accounts: [] };
 
   const { userId, iv } = session;
 
