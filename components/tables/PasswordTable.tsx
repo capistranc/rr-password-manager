@@ -204,10 +204,11 @@ export const PasswordTable = ({ userId, accounts }) => {
           Pass Manager
         </Heading>
         <AddButton
+          px="8"
           userId={userId}
           justifySelf="flex-end"
-          position="absolute"
-          right="0"
+          // position="absolute"
+          // right="0"
           mr="8"
         />
       </Flex>
