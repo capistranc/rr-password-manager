@@ -12,7 +12,7 @@ import {
 import { getLoginSession } from "../lib/auth";
 import Iron from "@hapi/iron";
 import { getAccounts } from "../lib/accounts";
-import { Box } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 
 import { VIEWER_QUERY } from "../utils/queries";
 
@@ -43,14 +43,16 @@ const Index = ({ accounts }) => {
 
   if (viewer) {
     return (
-      <Box>
-        You're signed in as {viewer.email} {viewer.userId} goto{" "}
+      <Box align="center" m="4">
+        You're signed in as <b>{viewer.email}</b> goto{" "}
         <NextLink href="/about">
           <a>about</a>
         </NextLink>
         page. or{" "}
-        <NextLink href="/signout">
-          <a>signout</a>
+        <NextLink href="/signout" passHref>
+          <Button p="4">
+            <a>Sign Out</a>
+          </Button>
         </NextLink>
         <PasswordTable userId={viewer.userId} accounts={accounts} />
       </Box>
