@@ -73,7 +73,7 @@ export const AccountForm = ({
             <InputGroup>
               <Input
                 id="url"
-                type="url"
+                type="string"
                 borderColor="gray.500"
                 placeholder="https://localhost:3000/"
                 defaultValue={url}
