@@ -23,6 +23,7 @@ export const typeDefs = gql`
   }
 
   input UpdateAccountInput {
+    userId: ID!
     accountId: ID!
     url: String!
     username: String!

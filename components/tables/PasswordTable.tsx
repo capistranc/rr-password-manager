@@ -1,68 +1,74 @@
 import {
   Flex,
   Heading,
-  chakra,
-  Button,
-  Link,
-  Stack,
-  FormLabel,
-  FormControl,
   Box,
-  Text,
-  FormErrorMessage,
   IconButton,
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
+  Tfoot,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
 } from "@chakra-ui/react";
 
 import Iron from "@hapi/iron";
 import NextLink from "next/link";
-import { Input, InputGroup, InputRightElement } from "@chakra-ui/react";
-import { useState } from "react";
 import { useRouter } from "next/router";
 import { gql, useMutation, useQuery } from "@apollo/client";
-
 import { HiOutlineTrash, HiPlus, HiPencil } from "react-icons/hi";
 import { PasswordField } from "../Fields/password";
 import { useDisclosure } from "@chakra-ui/hooks";
 
 export const PasswordForm = () => {};
 
-const DELETE_QUERY = gql`
-  mutation DeleteAccountMutation($accountId: ID!) {
-    deleteAccount(input: { accountId: $accountId })
-  }
-`;
-
 import { AccountForm } from "../forms/AccountForm";
+import {
+  ADD_ACCOUNT_MUTATION,
+  DELETE_ACCOUNT_MUTATION,
+  UPDATE_ACCOUNT_MUTATION,
+} from "../../utils/mutations";
 
-export const PasswordTable = ({ accounts }) => {
+export const PasswordTable = ({ userId, accounts }) => {
+  const [addAccount] = useMutation(ADD_ACCOUNT_MUTATION);
+  const [updateAccount] = useMutation(UPDATE_ACCOUNT_MUTATION);
   const router = useRouter();
   // Call this function whenever you want to
   // refresh props!
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   const refreshData = () => {
     router.replace(router.asPath);
   };
 
-  const DeleteButton = ({ accountId }) => {
-    const [deleteAccount] = useMutation(DELETE_QUERY);
+  async function handleAdd({ url, username, password, userId }) {
+    console.log("HANDLE ADD");
+    try {
+      console.log("HANDLE ADD");
+      const { data } = await addAccount({
+        variables: {
+          userId,
+          url,
+          username,
+          password,
+        },
+      });
+      refreshData();
 
-    async function handleSubmit() {
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const DeleteButton = ({ accountId }) => {
+    const [deleteAccount] = useMutation(DELETE_ACCOUNT_MUTATION);
+
+    async function handleDelete() {
       try {
         const ret = await deleteAccount({
           variables: {
@@ -78,14 +84,35 @@ export const PasswordTable = ({ accounts }) => {
     return (
       <IconButton
         aria-label="Delete Account"
-        onClick={() => handleSubmit()}
+        onClick={() => handleDelete()}
         icon={<HiOutlineTrash />}
       />
     );
   };
 
-  const EditButton = ({}) => {
+  async function handleEdit({ accountId, url, username, password, userId }) {
+    try {
+      const { data } = await updateAccount({
+        variables: {
+          userId,
+          accountId,
+          url,
+          username,
+          password,
+        },
+      });
+      refreshData();
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const EditButton = ({ account }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    // console.log("editbutton", account);
 
     return (
       <>
@@ -93,32 +120,54 @@ export const PasswordTable = ({ accounts }) => {
           aria-label="Edit Account Info"
           icon={<HiPencil />}
           onClick={onOpen}
-        ></IconButton>
+        />
 
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Edit Account Info</ModalHeader>
             <ModalCloseButton />
-            <ModalBody>"TEST"</ModalBody>
-
-            <ModalFooter>
-              <Flex justify="space-between">
-                <Button colorScheme="gray" mr={3} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button variant="ghost" colorScheme="blue">
-                  Submit
-                </Button>
-              </Flex>
-            </ModalFooter>
+            <ModalBody>
+              <AccountForm propData={{ account }} onSubmit={handleEdit} />
+            </ModalBody>
           </ModalContent>
         </Modal>
       </>
     );
   };
 
-  const TableRow = ({ url, username, password, accountId }) => {
+  const AddButton = ({ userId, ...props }) => {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    // console.log("editbutton", account);
+
+    return (
+      <Box {...props}>
+        <IconButton
+          aria-label="Add Account"
+          icon={<HiPlus />}
+          onClick={onOpen}
+        />
+
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add a new Account</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <AccountForm
+                propData={{ account: { userId } }}
+                onSubmit={handleAdd}
+              />
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </Box>
+    );
+  };
+
+  const TableRow = (account) => {
+    const { url, username, password, accountId } = account;
     return (
       <Tr>
         <Td>
@@ -130,7 +179,8 @@ export const PasswordTable = ({ accounts }) => {
         </Td>
         <Td>
           <Flex>
-            <DeleteButton accountId={accountId} /> <EditButton />
+            <EditButton account={account} />{" "}
+            <DeleteButton accountId={accountId} />
           </Flex>
         </Td>
       </Tr>
@@ -145,9 +195,23 @@ export const PasswordTable = ({ accounts }) => {
       m="0 auto"
       mt="8"
       p="12"
-      maxWidth="52rem"
+      maxWidth="72rem"
       align="center"
     >
+      <Flex mb="8" justify="center" position="relative">
+        <Heading d="inline">RR </Heading>
+        <Heading color="red.600" d="inline">
+          Pass Manager
+        </Heading>
+        <AddButton
+          userId={userId}
+          justifySelf="flex-end"
+          position="absolute"
+          right="0"
+          mr="8"
+        />
+      </Flex>
+
       <Table>
         <Thead>
           <Tr>

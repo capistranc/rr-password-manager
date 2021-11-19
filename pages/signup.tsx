@@ -27,19 +27,10 @@ import {
   useColorMode,
 } from "@chakra-ui/react";
 
-const SignUpMutation = gql`
-  mutation SignUpMutation($email: String!, $password: String!) {
-    signUp(input: { email: $email, password: $password }) {
-      user {
-        userId
-        email
-      }
-    }
-  }
-`;
+import { SIGNUP_MUTATION } from "../utils/mutations";
 
 const SignUp: NextPage = () => {
-  const [signUp] = useMutation(SignUpMutation, {
+  const [signUp] = useMutation(SIGNUP_MUTATION, {
     onError: function ({ graphQLErrors, networkError }) {
       if (graphQLErrors) {
         const {

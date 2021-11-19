@@ -21,20 +21,11 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 
-const SignInMutation = gql`
-  mutation SignInMutation($email: String!, $password: String!) {
-    signIn(input: { email: $email, password: $password }) {
-      user {
-        userId
-        email
-      }
-    }
-  }
-`;
+import { SIGNIN_MUTATION } from "../utils/mutations";
 
 function SignIn() {
   const client = useApolloClient();
-  const [signIn] = useMutation(SignInMutation, {
+  const [signIn] = useMutation(SIGNIN_MUTATION, {
     onError: function ({ graphQLErrors, networkError }) {
       if (graphQLErrors) {
         const {

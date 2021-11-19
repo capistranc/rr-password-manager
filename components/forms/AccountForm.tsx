@@ -21,25 +21,25 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 
-const ADD_ACCOUNT_QUERY = gql`
-  mutation addAccount($userId: ID!, $username: String!, $password: String!, $url: String!) {
-    addAccount(input: { userId: $userId, username: $username, password: $password, $url: url }) {
-      accountId
-    }
-  }
-`;
+type Account = {
+  accountId?: string;
+  url?: string;
+  username?: string;
+  password?: string;
+  userId: string;
+};
 
-const UPDATE_ACCOUNT_QUERY = gql`
-mutation updateAccount($accountId: ID!, $username: String!, $password: String!, $url: String!) {
-  updateAccount(input: { accountId: $accountId, username: $username, password: $password, $url: url }) {
-    accountId
-  }
-}
-`;
+type PropData = {
+  account: Account;
+};
 
-export const AccountForm = () => {
-  const [addAccount] = useMutation(ADD_ACCOUNT_QUERY);
-
+export const AccountForm = ({
+  propData = null,
+  onSubmit,
+}: {
+  propData: PropData;
+  onSubmit: any;
+}) => {
   const router = useRouter();
   const {
     handleSubmit,
@@ -48,85 +48,57 @@ export const AccountForm = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  async function onSubmit({ email, password }) {
-    try {
-      const { data } = await addAccount({
-        variables: {
-          email,
-          password,
-        },
-      });
-
-      console.log(data);
-    } catch (error) {
-      setError("password", {
-        type: "manual",
-        message: "User/Password combination does not exist",
-      });
-    }
-  }
+  const { url, username, accountId, userId, password } = propData?.account;
 
   return (
     <>
       <chakra.form
-        id="contact-form"
+        id="account-form"
         onSubmit={handleSubmit(onSubmit)}
-        boxShadow="0 0 29px 0 rgb(0 0 0 / 9%)"
-        border={"4px dashedArray 12,5"}
         borderRadius="4px"
         m="0 auto"
         p="12"
-        mt="8"
         maxWidth="36rem"
         align="center"
       >
-        <Box>
-          <Heading d="inline">RR </Heading>
-          <Heading color="red.600" d="inline">
-            Pass
-          </Heading>
-        </Box>
-
-        <Flex
-          justify="space-between"
-          borderBottom="2px solid"
-          borderColor="rgba(0.4,0.4,0.4,0.1)"
-          my="4"
-        >
-          <Text fontSize="xl"> LOG IN </Text>
-          <Box>
-            or{" "}
-            <NextLink href="/signup" passHref>
-              <Link color="blue.500">CREATE AN ACCOUNT</Link>
-            </NextLink>
-          </Box>
-        </Flex>
-
         <Stack spacing="4" align="center">
+          <Input display="none" value={userId} {...register("userId")} />
+          <Input
+            display="none"
+            defaultValue={accountId}
+            {...register("accountId")}
+          />
           <FormControl isRequired isInvalid={errors.email}>
-            <FormLabel>Email: </FormLabel>
+            <FormLabel>URL: </FormLabel>
             <InputGroup>
               <Input
-                id="email"
-                type="email"
+                id="url"
+                type="url"
                 borderColor="gray.500"
-                placeholder="foobar@gmail.com"
-                {...register("email", {
-                  minLength: {
-                    value: 8,
-                    message: "Minimum length should be 4",
-                  },
-                  pattern: {
-                    message:
-                      "Email must be formatted properly: JackieChan@gmail.com",
-                    value:
-                      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  },
-                })}
+                placeholder="https://localhost:3000/"
+                defaultValue={url}
+                {...register("url")}
               />
             </InputGroup>
             <FormErrorMessage display="inline">
-              {errors?.email?.message}
+              {errors?.url?.message}
+            </FormErrorMessage>
+          </FormControl>
+
+          <FormControl isRequired isInvalid={errors.email}>
+            <FormLabel>Username: </FormLabel>
+            <InputGroup>
+              <Input
+                id="username"
+                type="username"
+                borderColor="gray.500"
+                placeholder="roundrobin"
+                defaultValue={username}
+                {...register("username")}
+              />
+            </InputGroup>
+            <FormErrorMessage display="inline">
+              {errors?.username?.message}
             </FormErrorMessage>
           </FormControl>
 
@@ -138,6 +110,7 @@ export const AccountForm = () => {
                 type="password"
                 borderColor="gray.500"
                 placeholder="Enter your password"
+                defaultValue={password}
                 {...register("password", {
                   minLength: {
                     value: 6,
@@ -161,7 +134,7 @@ export const AccountForm = () => {
             isLoading={isSubmitting}
             loadingText="Sending..."
           >
-            LOG IN
+            Submit
           </Button>
         </Stack>
       </chakra.form>

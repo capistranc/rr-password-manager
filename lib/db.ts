@@ -2,9 +2,9 @@ const mysql = require("serverless-mysql");
 
 export const db = mysql({
   config: {
-    host: "pass-manager-instance-1.c8rjbc3rax29.us-east-2.rds.amazonaws.com",
-    user: "admin",
-    password: "omglevel7",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
   },
 });
 

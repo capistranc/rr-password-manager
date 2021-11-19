@@ -26,33 +26,14 @@ import {
   Box,
 } from "@chakra-ui/react";
 
-const AccountsQuery = gql`
-  query AccountsQuery($userId: ID!) {
-    accounts(userId: $userId) {
-      accountId
-      url
-      username
-      hash
-    }
-  }
-`;
-
-const ViewerQuery = gql`
-  query ViewerQuery {
-    viewer {
-      userId
-      email
-      iv
-    }
-  }
-`;
+import { VIEWER_QUERY } from "../utils/queries";
 
 import { PasswordTable } from "../components/tables/PasswordTable";
 
 const Index = ({ accounts }) => {
   const router = useRouter();
 
-  const { data, loading, error } = useQuery(ViewerQuery);
+  const { data, loading, error } = useQuery(VIEWER_QUERY);
   const viewer = data?.viewer;
   const shouldRedirect = !(loading || error || viewer);
 
@@ -75,7 +56,7 @@ const Index = ({ accounts }) => {
   if (viewer) {
     return (
       <Box>
-        You're signed in as {viewer.email} goto{" "}
+        You're signed in as {viewer.email} {viewer.userId} goto{" "}
         <NextLink href="/about">
           <a>about</a>
         </NextLink>
@@ -83,7 +64,7 @@ const Index = ({ accounts }) => {
         <NextLink href="/signout">
           <a>signout</a>
         </NextLink>
-        <PasswordTable accounts={accounts} />
+        <PasswordTable userId={viewer.userId} accounts={accounts} />
       </Box>
     );
   }
@@ -96,7 +77,7 @@ const Index = ({ accounts }) => {
 export async function getServerSideProps(context: NextPageContext) {
   const session = await getLoginSession(context.req as NextApiRequest);
 
-  if (!session) return { accounts: [] };
+  if (!session) return { props: { accounts: [] } };
 
   const { userId, iv } = session;
 
