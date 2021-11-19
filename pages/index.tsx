@@ -94,7 +94,11 @@ const Index = ({ accounts }) => {
 //OK I cheated, I skipped graphQL here..
 //This will slow down the caching in graphql but this whole thing was a learning experiment anyways
 export async function getServerSideProps(context: NextPageContext) {
-  const { userId, iv } = await getLoginSession(context.req as NextApiRequest);
+  const session = await getLoginSession(context.req as NextApiRequest);
+
+  if (!session) return;
+
+  const { userId, iv } = session;
 
   let accounts = await getAccounts({ userId });
 
