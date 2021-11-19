@@ -4,7 +4,10 @@
 
 - [NextJS](https://nextjs.org/)
 - [GraphQL](https://graphql.org/)
-  I created this project with what I would consider to be a non-ideal tech stack for the sake of self-education.
+- [NodeJS](https://nodejs.org/en/) - implicit in the built-in serverless functions from NextJS
+- AWS MySQL RDB
+
+I created this project with what I would consider to be a non-ideal tech stack for the sake of self-education.
 
 NextJS tends to shine in the realm of SEO because of all the Static/SSR tools built into it. It's built in routing simplifies folder structure greatly when you have an application with many pages.
 
