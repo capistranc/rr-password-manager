@@ -12,19 +12,7 @@ import {
 import { getLoginSession } from "../lib/auth";
 import Iron from "@hapi/iron";
 import { getAccounts } from "../lib/accounts";
-import {
-  Flex,
-  Heading,
-  InputGroup,
-  Input,
-  chakra,
-  Button,
-  Link,
-  Stack,
-  FormLabel,
-  FormControl,
-  Box,
-} from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 
 import { VIEWER_QUERY } from "../utils/queries";
 
@@ -75,28 +63,32 @@ const Index = ({ accounts }) => {
 //OK I cheated, I skipped graphQL here..
 //This will slow down the caching in graphql but this whole thing was a learning experiment anyways
 export async function getServerSideProps(context: NextPageContext) {
-  const session = await getLoginSession(context.req as NextApiRequest);
+  try {
+    const session = await getLoginSession(context.req as NextApiRequest);
 
-  if (!session) return { props: { accounts: [] } };
+    if (!session) return { props: { accounts: [] } };
 
-  const { userId, iv } = session;
+    const { userId, iv } = session;
 
-  let accounts = await getAccounts({ userId });
+    let accounts = await getAccounts({ userId });
 
-  accounts = await Promise.all(
-    accounts.map(async (a) => {
-      const password = await Iron.unseal(a.hash, iv, Iron.defaults);
+    accounts = await Promise.all(
+      accounts.map(async (a) => {
+        const password = await Iron.unseal(a.hash, iv, Iron.defaults);
 
-      return {
-        ...a,
-        password,
-      };
-    }),
-  );
+        return {
+          ...a,
+          password,
+        };
+      }),
+    );
 
-  return {
-    props: { accounts }, // will be passed to the page component as props
-  };
+    return {
+      props: { accounts }, // will be passed to the page component as props
+    };
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export default Index;
